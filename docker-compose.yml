@@ -1,0 +1,25 @@
+services:
+    napcat:
+        environment:
+            - NAPCAT_UID=0
+            - NAPCAT_GID=0
+        ports:
+            - 5000:3000
+            - 11111:11111
+            - 6099:6099
+        container_name: napcat
+        network_mode: bridge
+        restart: always
+        image: mlikiowa/napcat-docker:latest
+        volumes:
+            - /etc/napcat/qq:/app/.config/QQ
+            - /etc/napcat/config:/app/napcat/config
+
+    bot:
+        environment:
+            - RUST_BACKTRACE=full
+        image: zecyel/fumo:latest
+        container_name: rust-bot
+        restart: no
+        depends_on:
+            - napcat
