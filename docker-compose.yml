@@ -4,7 +4,7 @@ services:
             - NAPCAT_UID=0
             - NAPCAT_GID=0
         ports:
-            - 5000:3000
+            - 3000:3000
             - 11111:11111
             - 6099:6099
         container_name: napcat
@@ -12,8 +12,8 @@ services:
         restart: always
         image: mlikiowa/napcat-docker:latest
         volumes:
-            - /etc/napcat/qq:/app/.config/QQ
-            - /etc/napcat/config:/app/napcat/config
+            - ./napcat/qq:/app/.config/QQ
+            - ./napcat/config:/app/napcat/config
 
     bot:
         environment:

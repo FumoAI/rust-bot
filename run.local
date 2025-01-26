@@ -1,0 +1,15 @@
+# run napcat
+docker run -d \
+    --name napcat \
+    --network bridge \
+    --restart always \
+    -e NAPCAT_UID=0 \
+    -e NAPCAT_GID=0 \
+    -p 3000:3000 \
+    -p 11111:11111 \
+    -p 6099:6099 \
+    -v C:/Users/Zecyel/Desktop/code/rust-bot/napcat/qq:/app/.config/QQ \
+    -v C:/Users/Zecyel/Desktop/code/rust-bot/napcat/config:/app/napcat/config \
+    mlikiowa/napcat-docker:latest
+
+docker run -d --name napcat --network bridge --restart always -e NAPCAT_UID=0 -e NAPCAT_GID=0 -p 3000:3000 -p 11111:11111 -p 6099:6099 -v C:/Users/Zecyel/Desktop/code/rust-bot/napcat/qq:/app/.config/QQ -v C:/Users/Zecyel/Desktop/code/rust-bot/napcat/config:/app/napcat/config mlikiowa/napcat-docker:latest
