@@ -9,6 +9,8 @@ hi = { version = "0.1.0", path = "plugins/hi" }
 kovi = "0.11.5"
 kovi-plugin-cmd = "0.1.0"
 kovi-plugin-title = { git = "https://github.com/Threkork/kovi-plugin-title.git", version = "0.1.0" }
+rustc-hash = "2.1.0"
+serde = "1.0.217"
 
 [workspace]
 members = [ "plugins/ai","plugins/hi"]
