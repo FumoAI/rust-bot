@@ -4,16 +4,19 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-ai = { version = "0.1.0", path = "plugins/ai" }
-hi = { version = "0.1.0", path = "plugins/hi" }
-kovi = "0.11.5"
+ai = { path = "plugins/ai" }
+hi = { path = "plugins/hi" }
+kovi = { workspace = true }
 kovi-plugin-cmd = "0.1.0"
 kovi-plugin-title = { git = "https://github.com/Threkork/kovi-plugin-title.git", version = "0.1.0" }
-rustc-hash = "2.1.0"
-serde = "1.0.217"
 
 [workspace]
-members = [ "plugins/ai","plugins/hi"]
+members = ["plugins/ai", "plugins/hi", "handler"]
 
 [workspace.dependencies]
 kovi = "0.11.5"
+rustc-hash = "2.1.0"
+serde = "1.0.217"
+openai_api_rust = "0.1.9"
+dotenv = "0.15.0"
+rand = "0.8.5"

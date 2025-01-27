@@ -1,9 +1,11 @@
 [package]
-name = "ai"
+name = "handler"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+
 [dependencies]
 kovi = { workspace = true }
-openai_api_rust = { workspace = true }
-dotenv = { workspace = true }
+serde = { workspace = true }
+rustc-hash = { workspace = true }

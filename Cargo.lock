@@ -574,6 +574,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "handler"
+version = "0.1.0"
+dependencies = [
+ "kovi",
+ "rustc-hash",
+ "serde",
+]
+
+[[package]]
 name = "hashbrown"
 version = "0.15.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1361,8 +1370,6 @@ dependencies = [
  "kovi",
  "kovi-plugin-cmd",
  "kovi-plugin-title",
- "rustc-hash",
- "serde",
 ]
 
 [[package]]
