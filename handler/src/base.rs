@@ -24,6 +24,14 @@ pub trait Handler: Send + Sync + Sized + 'static {
     fn new() -> Self;
 
     fn mount_on(bot: &mut Bot) {
+        kovi::log::info!("Mounting plugin: {}", Self::NAME);
+
+        bot.mount_main(
+            Self::NAME,
+            Self::VERSION,
+            Arc::new(move || Box::pin(setup::<Self>())),
+        );
+
         async fn setup<T: Handler + 'static>() {
             let handler = Arc::new(Mutex::new(T::new()));
             use_listener!(handler, on_msg);
@@ -33,12 +41,6 @@ pub trait Handler: Send + Sync + Sized + 'static {
             use_listener!(handler, on_all_notice);
             use_listener!(handler, on_all_request);
         }
-
-        bot.mount_main(
-            Self::NAME,
-            Self::VERSION,
-            Arc::new(move || Box::pin(setup::<Self>())),
-        )
     }
 
     fn on_msg(&mut self, message: Arc<MsgEvent>) -> impl Future<Output = ()> + Send {
