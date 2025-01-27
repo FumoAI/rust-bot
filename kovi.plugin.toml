@@ -1,8 +1,0 @@
-[hi]
-enable_on_startup = true
-access_control = false
-list_mode = "WhiteList"
-
-[hi.access_list]
-friends = []
-groups = []
