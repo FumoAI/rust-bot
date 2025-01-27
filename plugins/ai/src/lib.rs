@@ -1,19 +1,18 @@
 use kovi::PluginBuilder as plugin;
-use openai_api_rust::*;
 use openai_api_rust::chat::*;
+use openai_api_rust::*;
 // use openai_api_rust::completions::*;
 use std::env;
-use dotenv::dotenv;
 
 #[kovi::plugin]
 async fn main() {
-    dotenv().ok();
+    dotenvy::dotenv().expect("Failed to load .env file");
     plugin::on_msg(|event| async move {
         if let Some(text) = event.borrow_text() {
             if !text.starts_with('%') {
                 return;
             }
-            
+
             let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY not set");
             let api_url = env::var("OPENAI_API_URL").expect("OPENAI_API_URL not set");
             let auth = Auth::new(&api_key);
@@ -31,7 +30,10 @@ async fn main() {
                 frequency_penalty: None,
                 logit_bias: None,
                 user: None,
-                messages: vec![Message { role: Role::User, content: text[1..].to_string() }],
+                messages: vec![Message {
+                    role: Role::User,
+                    content: text[1..].to_string(),
+                }],
             };
 
             match openai.chat_completion_create(&body) {
@@ -42,7 +44,7 @@ async fn main() {
                     }
                 }
                 Err(err) => {
-                    event.reply(&format!("Error: {}", err));
+                    event.reply(format!("Error: {}", err));
                 }
             }
         }
