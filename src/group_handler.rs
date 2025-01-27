@@ -91,13 +91,15 @@ impl GroupHandler for Counter {
             if text.starts_with("%+") {
                 if let Ok(num) = text[2..].trim().parse::<u64>() {
                     self.count += num;
+                    self.context
+                        .send_msg(format!("Counter increased to {}", self.count));
+                } else {
+                    self.context.send_msg("Invalid number");
                 }
             } else if text == "%reset" {
                 self.count = 0;
-            } else {
-                self.count += 1;
+                self.context.send_msg("Counter reset");
             }
-            self.context.send_msg(format!("Count: {}", self.count));
         }
     }
 }
