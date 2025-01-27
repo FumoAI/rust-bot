@@ -18,7 +18,8 @@ macro_rules! use_listener {
     };
 }
 
-pub trait BaseHandler: Send + Sync + Sized + 'static {
+#[allow(unused_variables)]
+pub trait Handler: Send + Sync + Sized + 'static {
     const NAME: &'static str;
     const VERSION: &'static str;
 
@@ -26,7 +27,7 @@ pub trait BaseHandler: Send + Sync + Sized + 'static {
     fn bot(&self) -> Arc<RuntimeBot>;
 
     fn mount_on(bot: &mut Bot) {
-        async fn setup<T: BaseHandler + 'static>() {
+        async fn setup<T: Handler + 'static>() {
             let handler = Arc::new(Mutex::new(T::new()));
             use_listener!(handler, on_msg);
             use_listener!(handler, on_admin_msg);
@@ -59,6 +60,9 @@ pub trait BaseHandler: Send + Sync + Sized + 'static {
         async {}
     }
     fn on_all_request(&mut self, message: Arc<RequestEvent>) -> impl Future<Output = ()> + Send {
+        async {}
+    }
+    fn drop(&mut self) -> impl Future<Output = ()> + Send {
         async {}
     }
 }
