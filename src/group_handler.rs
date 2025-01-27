@@ -68,7 +68,7 @@ pub fn mount_group_handler<T: GroupHandler + 'static>(bot: &mut Bot) {
     )
 }
 
-struct Counter {
+pub struct Counter {
     context: GroupContext,
     count: u64,
 }
