@@ -872,6 +872,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "kovi-plugin-title"
+version = "0.1.0"
+source = "git+https://github.com/Threkork/kovi-plugin-title.git#fe50c0b022fd8ed710449853d0aa6ab54a1d086e"
+dependencies = [
+ "kovi",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.169"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1230,6 +1238,7 @@ version = "0.1.0"
 dependencies = [
  "hi",
  "kovi",
+ "kovi-plugin-title",
 ]
 
 [[package]]

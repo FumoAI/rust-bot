@@ -1,4 +1,4 @@
-use kovi::{bot::plugin_builder::event, PluginBuilder as plugin};
+use kovi::PluginBuilder as plugin;
 
 #[kovi::plugin]
 async fn main() {
