@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Markdown Renderer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css">
+  <style>
+    .markdown-body {
+      box-sizing: border-box;
+      min-width: 200px;
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 45px;
+    }
+  </style>
+</head>
+
+<body>
+  <article class="markdown-body" id="content"></article>
+  <script type="module">
+    import { fromAsyncCodeToHtml } from 'https://esm.sh/@shikijs/markdown-it/async'
+    import MarkdownItAsync from 'https://esm.sh/markdown-it-async'
+    import { codeToHtml } from 'https://esm.sh/shiki'
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const content = document.getElementById('content');
+      content.innerHTML = '<p>Loading...</p>'
+      try {
+        const md = MarkdownItAsync()
+
+        md.use(
+          fromAsyncCodeToHtml(
+            codeToHtml,
+            {
+              themes: {
+                light: 'github-light',
+                dark: 'github-dark',
+              }
+            }
+          )
+        )
+
+        window.renderMarkdown = async (markdown) => {
+          try {
+            content.classList.remove('rendering-finished')
+            content.innerHTML = '<p>Rendering...</p>'
+            const html = await md.renderAsync(markdown)
+            content.innerHTML = html
+            content.dataset.ok = 'true'
+          } catch (e) {
+            content.innerHTML = `<p>Error: ${e.message}</p>`
+          } finally {
+            content.classList.add('rendering-finished')
+          }
+        }
+      } catch (e) {
+        content.innerHTML = `<p>Error: ${e.message}</p>`
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -3,3 +3,4 @@ target
 **/.env
 kovi.plugin.toml
 kovi.conf.toml
+md_renderer/test.png
