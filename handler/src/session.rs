@@ -1,4 +1,4 @@
-use kovi::{Message, MsgEvent, PluginBuilder, RuntimeBot};
+use kovi::{Bot, Message, MsgEvent, PluginBuilder, RuntimeBot};
 use rustc_hash::FxHashMap;
 use serde::Serialize;
 use std::{future::Future, sync::Arc};
@@ -27,6 +27,10 @@ pub trait SessionHandler: Send + Sync + Sized + 'static {
     }
     fn id(&self) -> SessionId {
         self.context().id
+    }
+
+    fn mount_on(bot: &mut Bot) {
+        SessionHandlerHost::<Self>::mount_on(bot);
     }
 
     fn send_msg<T>(&self, message: T)
