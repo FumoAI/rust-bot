@@ -5,22 +5,28 @@ use std::{future::Future, sync::Arc};
 
 use crate::Handler;
 
-pub struct GroupContext {
-    bot: Arc<RuntimeBot>,
-    group_id: i64,
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum SessionId {
+    Private(i64),
+    Group(i64),
 }
 
-pub trait GroupHandler: Send + Sync + Sized + 'static {
+pub struct SessionContext {
+    bot: Arc<RuntimeBot>,
+    id: SessionId,
+}
+
+pub trait SessionHandler: Send + Sync + Sized + 'static {
     const NAME: &'static str;
     const VERSION: &'static str;
 
-    fn new(context: GroupContext) -> Self;
-    fn context(&self) -> &GroupContext;
+    fn new(context: SessionContext) -> Self;
+    fn context(&self) -> &SessionContext;
     fn bot(&self) -> Arc<RuntimeBot> {
         self.context().bot.clone()
     }
-    fn group_id(&self) -> i64 {
-        self.context().group_id
+    fn id(&self) -> SessionId {
+        self.context().id
     }
 
     fn send_msg<T>(&self, message: T)
@@ -28,18 +34,25 @@ pub trait GroupHandler: Send + Sync + Sized + 'static {
         Message: From<T>,
         T: Serialize,
     {
-        self.bot().send_group_msg(self.group_id(), message);
+        match self.id() {
+            SessionId::Private(user_id) => {
+                self.bot().send_private_msg(user_id, message);
+            }
+            SessionId::Group(group_id) => {
+                self.bot().send_group_msg(group_id, message);
+            }
+        }
     }
 
     fn on_msg(&mut self, message: Arc<MsgEvent>) -> impl Future<Output = ()> + Send;
 }
 
-pub struct GroupHandlerHost<T: GroupHandler> {
+pub struct SessionHandlerHost<T: SessionHandler> {
     bot: Arc<RuntimeBot>,
-    instances: FxHashMap<i64, T>,
+    instances: FxHashMap<SessionId, T>,
 }
 
-impl<T: GroupHandler> Handler for GroupHandlerHost<T> {
+impl<T: SessionHandler> Handler for SessionHandlerHost<T> {
     const NAME: &'static str = T::NAME;
     const VERSION: &'static str = T::VERSION;
 
@@ -49,17 +62,19 @@ impl<T: GroupHandler> Handler for GroupHandlerHost<T> {
             instances: FxHashMap::default(),
         }
     }
-    fn bot(&self) -> Arc<RuntimeBot> {
-        self.bot.clone()
-    }
 
-    fn on_group_msg(&mut self, message: Arc<MsgEvent>) -> impl Future<Output = ()> + Send {
-        let bot = self.bot();
-        let group_id = message.group_id.expect("Message must be from a group");
-        let instance = self
-            .instances
-            .entry(group_id)
-            .or_insert_with(|| T::new(GroupContext { bot, group_id }));
+    fn on_msg(&mut self, message: Arc<MsgEvent>) -> impl Future<Output = ()> + Send {
+        let id = if let Some(group_id) = message.group_id {
+            SessionId::Group(group_id)
+        } else {
+            SessionId::Private(message.user_id)
+        };
+        let instance = self.instances.entry(id).or_insert_with(|| {
+            T::new(SessionContext {
+                bot: self.bot.clone(),
+                id,
+            })
+        });
         instance.on_msg(message)
     }
 }
@@ -69,18 +84,18 @@ mod test {
     use super::*;
 
     pub struct Counter {
-        context: GroupContext,
+        context: SessionContext,
         count: u64,
     }
 
-    impl GroupHandler for Counter {
+    impl SessionHandler for Counter {
         const NAME: &'static str = "Counter";
         const VERSION: &'static str = "0.0.1";
 
-        fn new(context: GroupContext) -> Self {
+        fn new(context: SessionContext) -> Self {
             Self { context, count: 0 }
         }
-        fn context(&self) -> &GroupContext {
+        fn context(&self) -> &SessionContext {
             &self.context
         }
 

@@ -1,6 +1,4 @@
-use kovi::{
-    tokio::sync::Mutex, Bot, MsgEvent, NoticeEvent, PluginBuilder, RequestEvent, RuntimeBot,
-};
+use kovi::{tokio::sync::Mutex, Bot, MsgEvent, NoticeEvent, PluginBuilder, RequestEvent};
 use std::{future::Future, sync::Arc};
 
 macro_rules! use_listener {
@@ -24,7 +22,6 @@ pub trait Handler: Send + Sync + Sized + 'static {
     const VERSION: &'static str;
 
     fn new() -> Self;
-    fn bot(&self) -> Arc<RuntimeBot>;
 
     fn mount_on(bot: &mut Bot) {
         async fn setup<T: Handler + 'static>() {
