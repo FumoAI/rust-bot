@@ -4,13 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+ai = { version = "0.1.0", path = "plugins/ai" }
 hi = { version = "0.1.0", path = "plugins/hi" }
 kovi = "0.11.5"
 kovi-plugin-cmd = "0.1.0"
 kovi-plugin-title = { git = "https://github.com/Threkork/kovi-plugin-title.git", version = "0.1.0" }
 
 [workspace]
-members = ["plugins/hi"]
+members = [ "plugins/ai","plugins/hi"]
 
 [workspace.dependencies]
 kovi = "0.11.5"

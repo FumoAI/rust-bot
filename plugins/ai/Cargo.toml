@@ -1,0 +1,9 @@
+[package]
+name = "ai"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+kovi.workspace = true
+openai_api_rust = "0.1.9"
+dotenv = "0.15.0"
