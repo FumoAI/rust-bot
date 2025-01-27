@@ -20,10 +20,10 @@ async fn main() {
 
             let body = ChatBody {
                 model: "gpt-3.5-turbo".to_string(),
-                max_tokens: Some(std::i32::MAX),
-                temperature: Some(1_f32),
-                top_p: Some(1_f32),
-                n: Some(1),
+                max_tokens: None,
+                temperature: None,
+                top_p: None,
+                n: None,
                 stream: Some(false),
                 stop: None,
                 presence_penalty: None,
