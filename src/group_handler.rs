@@ -18,54 +18,47 @@ impl GroupContext {
     }
 }
 
-pub trait GroupHandler: Send + Sync {
-    fn name() -> &'static str {
-        "<unnamed>"
-    }
+pub trait GroupHandler: Send + Sync + Sized + 'static {
+    const NAME: &'static str = "<unnamed>";
+    const VERSION: &'static str = "0.0.1";
 
-    fn version() -> &'static str {
-        "0.0.1"
-    }
-
-    fn new(context: GroupContext) -> Self
-    where
-        Self: Sized;
+    fn new(context: GroupContext) -> Self;
 
     fn on_msg(&mut self, message: Arc<MsgEvent>) -> impl Future<Output = ()> + Send;
-}
 
-pub fn mount_group_handler<T: GroupHandler + 'static>(bot: &mut Bot) {
-    async fn setup<T: GroupHandler + 'static>() {
-        let bot = PluginBuilder::get_runtime_bot();
-        let instances = Arc::new(Mutex::new(FxHashMap::<i64, Arc<Mutex<T>>>::default()));
+    fn mount_on(bot: &mut Bot) {
+        async fn setup<T: GroupHandler + 'static>() {
+            let bot = PluginBuilder::get_runtime_bot();
+            let instances = Arc::new(Mutex::new(FxHashMap::<i64, Arc<Mutex<T>>>::default()));
 
-        PluginBuilder::on_group_msg(move |e| {
-            let bot = bot.clone();
-            let instances = instances.clone();
-            async move {
-                let group_id = e.group_id.expect("Message must be from a group");
-                let instance = {
-                    let mut instances = instances.lock().await;
-                    instances
-                        .entry(group_id)
-                        .or_insert_with(|| {
-                            let context = GroupContext { bot, group_id };
-                            Arc::new(Mutex::new(T::new(context)))
-                        })
-                        .clone()
-                };
+            PluginBuilder::on_group_msg(move |e| {
+                let bot = bot.clone();
+                let instances = instances.clone();
+                async move {
+                    let group_id = e.group_id.expect("Message must be from a group");
+                    let instance = {
+                        let mut instances = instances.lock().await;
+                        instances
+                            .entry(group_id)
+                            .or_insert_with(|| {
+                                let context = GroupContext { bot, group_id };
+                                Arc::new(Mutex::new(T::new(context)))
+                            })
+                            .clone()
+                    };
 
-                let mut instance = instance.lock().await;
-                instance.on_msg(e).await;
-            }
-        });
+                    let mut instance = instance.lock().await;
+                    instance.on_msg(e).await;
+                }
+            });
+        }
+
+        bot.mount_main(
+            Self::NAME,
+            Self::VERSION,
+            Arc::new(move || Box::pin(setup::<Self>())),
+        )
     }
-
-    bot.mount_main(
-        T::name(),
-        T::version(),
-        Arc::new(move || Box::pin(setup::<T>())),
-    )
 }
 
 pub struct Counter {
@@ -74,13 +67,7 @@ pub struct Counter {
 }
 
 impl GroupHandler for Counter {
-    fn name() -> &'static str {
-        "Counter"
-    }
-
-    fn version() -> &'static str {
-        "0.0.1"
-    }
+    const NAME: &'static str = "Counter";
 
     fn new(context: GroupContext) -> Self {
         Self { context, count: 0 }
