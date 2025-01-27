@@ -10,7 +10,7 @@ async fn main() {
     dotenv().ok();
     plugin::on_msg(|event| async move {
         if let Some(text) = event.borrow_text() {
-            if text.starts_with('%') {
+            if !text.starts_with('%') {
                 return;
             }
             
